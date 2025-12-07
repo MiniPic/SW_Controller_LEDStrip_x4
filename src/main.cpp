@@ -45,6 +45,15 @@ volatile bool networkReady = false;
 volatile bool sACN1_Ready = false;
 volatile bool sACN2_Ready = false;
 
+// ======================= DIP-SWITCH ===========================
+
+#define DIPSW1 23
+#define DIPSW2 24
+#define DIPSW3 25
+#define DIPSW4 26
+
+volatile uint32_t UNIVERS_OFFSET = 0;
+
 // ======================= sACN / DMX BUFFERS ==================
 
 // sACN : 1 receiver par univers
@@ -71,6 +80,18 @@ volatile uint8_t strobeStrip4 = 0;
 uint32_t getUIDWord(int index) {
     volatile uint32_t *UID = (uint32_t *)0x401F4410; // OCOTP_HW_OCOTP_CFG0
     return UID[index];
+}
+
+uint32_t readDipUniverseOffset() {
+    uint8_t value = 0;
+
+    // Rappel: LOW = interrupteur ON
+    if (digitalRead(DIPSW1) == LOW) value |= (1 << 0);  // bit 0
+    if (digitalRead(DIPSW2) == LOW) value |= (1 << 1);  // bit 1
+    if (digitalRead(DIPSW3) == LOW) value |= (1 << 2);  // bit 2
+    if (digitalRead(DIPSW4) == LOW) value |= (1 << 3);  // bit 3
+
+    return (uint32_t)value*2;
 }
 
 // ======================= OUTILS TEMPS / STROBE ===============
@@ -433,6 +454,11 @@ void setup()
     // seed random pour le mode random strobe
     randomSeed(analogRead(A0));
 
+    pinMode(DIPSW1,INPUT);
+    pinMode(DIPSW2,INPUT);
+    pinMode(DIPSW3,INPUT);
+    pinMode(DIPSW4,INPUT);
+
     uint32_t uid = getUIDWord(0);   // Exemple : un entier 32 bits
     byte mac[] = { 0x04, 0xE9, 0xE5, 0x00, 0x00, 0x02 }; // MAC à adapter si besoin
     mac[3] = (uid >> 0)  & 0xFF;
@@ -476,14 +502,16 @@ void setup()
     recv1.callbackSource(newSource1);
     recv1.callbackFramerate(framerate1);
     recv1.callbackTimeout(timeout1);
-    recv1.begin(UNIVERSE_1);    // Univers 1 en multicast
+    recv1.begin(UNIVERSE_1 + readDipUniverseOffset());    // Univers 1 en multicast
 
     recv2.callbackDMX(dmxReceived2);
     recv2.callbackSource(newSource2);
     recv2.callbackFramerate(framerate2);
     recv2.callbackTimeout(timeout2);
-    recv2.begin(UNIVERSE_2);    // Univers 2 en multicast
+    recv2.begin(UNIVERSE_2 + readDipUniverseOffset());    // Univers 2 en multicast
 
+    Serial.print("Offset Univers: ");
+    Serial.println(readDipUniverseOffset());
     Serial.println("sACN receivers démarrés.");
 
     // Threads
