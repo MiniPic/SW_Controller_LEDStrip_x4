@@ -319,69 +319,78 @@ void ledThread()
 
         // Strip 2
         if (strobeStrip2 <= 10) {
+            // pas de strobe, on garde les couleurs DMX
         } else if (strobeStrip2 <= 128) {
+            // strobe plein : tout ON ou tout OFF
             if (!on2) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip2.setPixelColor(i, 0);
             }
-        } else {
+        } else { 
+            // strobe random : LEDs allumées aléatoirement en phase ON
             if (!on2) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip2.setPixelColor(i, 0);
-            } else if (on2 && !prevOn2) {
-                for (int i = 0; i < LEDS_PER_STRIP; i++) {
-                    if (random(100) < 50) {
-                        // garder couleur
-                    } else {
-                        strip2.setPixelColor(i, 0);
-                    }
-                }
+            }
+            else
+            {
+                uint32_t s_rand = random(LEDS_PER_STRIP-1);
+                for (int i = 0; i < s_rand; i++)
+                    strip2.setPixelColor(i, 0);
+                for (int i = s_rand+1; i < LEDS_PER_STRIP; i++)
+                    strip2.setPixelColor(i, 0);
             }
         }
         prevOn2 = on2;
 
         // Strip 3
         if (strobeStrip3 <= 10) {
+            // pas de strobe, on garde les couleurs DMX
         } else if (strobeStrip3 <= 128) {
+            // strobe plein : tout ON ou tout OFF
             if (!on3) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip3.setPixelColor(i, 0);
             }
-        } else {
+        } else { 
+            // strobe random : LEDs allumées aléatoirement en phase ON
             if (!on3) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip3.setPixelColor(i, 0);
-            } else if (on3 && !prevOn3) {
-                for (int i = 0; i < LEDS_PER_STRIP; i++) {
-                    if (random(100) < 50) {
-                        // garder couleur
-                    } else {
-                        strip3.setPixelColor(i, 0);
-                    }
-                }
+            }
+            else
+            {
+                uint32_t s_rand = random(LEDS_PER_STRIP-1);
+                for (int i = 0; i < s_rand; i++)
+                    strip3.setPixelColor(i, 0);
+                for (int i = s_rand+1; i < LEDS_PER_STRIP; i++)
+                    strip3.setPixelColor(i, 0);
             }
         }
         prevOn3 = on3;
 
         // Strip 4
         if (strobeStrip4 <= 10) {
+            // pas de strobe, on garde les couleurs DMX
         } else if (strobeStrip4 <= 128) {
+            // strobe plein : tout ON ou tout OFF
             if (!on4) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip4.setPixelColor(i, 0);
             }
-        } else {
+        } else { 
+            // strobe random : LEDs allumées aléatoirement en phase ON
             if (!on4) {
                 for (int i = 0; i < LEDS_PER_STRIP; i++)
                     strip4.setPixelColor(i, 0);
-            } else if (on4 && !prevOn4) {
-                for (int i = 0; i < LEDS_PER_STRIP; i++) {
-                    if (random(100) < 50) {
-                        // garder couleur
-                    } else {
-                        strip4.setPixelColor(i, 0);
-                    }
-                }
+            }
+            else
+            {
+                uint32_t s_rand = random(LEDS_PER_STRIP-1);
+                for (int i = 0; i < s_rand; i++)
+                    strip4.setPixelColor(i, 0);
+                for (int i = s_rand+1; i < LEDS_PER_STRIP; i++)
+                    strip4.setPixelColor(i, 0);
             }
         }
         prevOn4 = on4;
