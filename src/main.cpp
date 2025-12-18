@@ -3,7 +3,6 @@
 #include <sACN.h>              // Librairie sACN de Stefan Staub
 #include <Adafruit_NeoPixel.h>
 #include <TeensyThreads.h>
-
 // ======================= CONFIG RESEAU =======================
 
 
@@ -54,6 +53,11 @@ volatile bool sACN2_Ready = false;
 
 volatile uint32_t UNIVERS_OFFSET = 0;
 
+#define WATCHDOG_TIMOUT 5000 //5s
+#define SACN_REBOOT_TIMEOUT_MS  (5UL * 60UL * 1000UL) // 5 minutes
+volatile uint32_t lastsACN;
+
+
 // ======================= sACN / DMX BUFFERS ==================
 
 // sACN : 1 receiver par univers
@@ -80,6 +84,12 @@ volatile uint8_t strobeStrip4 = 0;
 uint32_t getUIDWord(int index) {
     volatile uint32_t *UID = (uint32_t *)0x401F4410; // OCOTP_HW_OCOTP_CFG0
     return UID[index];
+}
+
+void hard_reset()
+{
+    delay(100);
+    SCB_AIRCR = 0x05FA0004;
 }
 
 uint32_t readDipUniverseOffset() {
@@ -194,6 +204,7 @@ void dmxReceived1()
     interrupts();
 
     sACN1_Ready = true;
+    lastsACN = millis();
 }
 
 // Univers 2 : réception DMX
@@ -207,6 +218,7 @@ void dmxReceived2()
     interrupts();
 
     sACN2_Ready = true;
+    lastsACN = millis();
 }
 
 // nouveaux sources
@@ -257,6 +269,8 @@ void sacnThread()
         recv1.update();
         recv2.update();
         threads.yield();
+        if(millis() - lastsACN > SACN_REBOOT_TIMEOUT_MS)
+            hard_reset();
     }
 }
 
@@ -481,7 +495,7 @@ void setup()
     Serial.println();
 
     // Ethernet en DHCP
-    Ethernet.begin(mac);
+    Ethernet.begin(mac,60*5*1000);  //5minutes
     IPAddress ip = Ethernet.localIP();
     Serial.print("IP locale: ");
     Serial.println(ip);
@@ -492,6 +506,7 @@ void setup()
     } else {
         networkReady = false;
         Serial.println("DHCP non obtenu.");
+        hard_reset();
     }
 
     // LEDs
@@ -518,6 +533,8 @@ void setup()
     recv2.callbackFramerate(framerate2);
     recv2.callbackTimeout(timeout2);
     recv2.begin(UNIVERSE_2 + readDipUniverseOffset());    // Univers 2 en multicast
+
+    lastsACN = millis();
 
     Serial.print("Offset Univers: ");
     Serial.println(readDipUniverseOffset());
