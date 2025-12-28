@@ -141,10 +141,10 @@ static inline void applyUniverseToStripSegment(
 
   for (int i = 0; i < LEDS_PER_UNIVERSE; i++) {
     int base = i * CHANNELS_PER_LED; // 0..396
-    uint8_t g   = dmx[base + 0];
-    uint8_t r   = dmx[base + 1];
-    uint8_t b   = dmx[base + 2];
-    uint8_t dim = dmx[base + 3];
+    uint8_t g   = dmx[base + 1];
+    uint8_t r   = dmx[base + 2];
+    uint8_t b   = dmx[base + 3];
+    uint8_t dim = dmx[base + 0];
 
     uint16_t r16 = (uint16_t)r * dim / 255;
     uint16_t g16 = (uint16_t)g * dim / 255;
