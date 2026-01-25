@@ -178,10 +178,10 @@ void applyUniverseToStrips(
         int baseIndex = STRIP_CHANNELS + i * CHANNELS_PER_LED; // 240 + ...
         if (baseIndex + 3 >= DMX_UNIVERSE_SIZE) break;
 
-        uint8_t g   = dmxData[baseIndex + 0];
-        uint8_t r   = dmxData[baseIndex + 1];
-        uint8_t b   = dmxData[baseIndex + 2];
-        uint8_t dim = dmxData[baseIndex + 3];
+        uint8_t g   = dmxData[baseIndex + 1];
+        uint8_t r   = dmxData[baseIndex + 2];
+        uint8_t b   = dmxData[baseIndex + 3];
+        uint8_t dim = dmxData[baseIndex + 0];
 
         uint16_t r16 = (uint16_t)r * dim / 255;
         uint16_t g16 = (uint16_t)g * dim / 255;
